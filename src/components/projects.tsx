@@ -29,16 +29,6 @@ const projects: Project[] = [
   },
   {
     id: 2,
-    title: "Multi Collection Mints",
-    description: "Highly customizable platform for minting multiple Solana NFT projects.",
-    tags: ["Metaplex", "Express", "Next.js"],
-    images: ["/project-previews/multi-mint/1.png"],
-    liveUrl: "https://multi-mints.vercel.app/",
-    githubUrl: "https://github.com/Utsav1106/multi-candy-machine-mints",
-    color: "#06b6d4"
-  },
-  {
-    id: 3,
     title: "ETAKit",
     description: "A pioneering force in the NFT ecosystem. Originating as a revitalized project, we've evolved into a comprehensive NFT platform offering services.",
     tags: ["Next.js", "Toolkit", "Metaplex"],
@@ -47,7 +37,7 @@ const projects: Project[] = [
     color: "#10b981"
   },
   {
-    id: 4,
+    id: 3,
     title: "KEK Minting",
     description: "1610 Lizards created to spread Kindness and Art.",
     tags: ["Metaplex", "Solana", "Typescript", "Next.js"],
@@ -56,7 +46,7 @@ const projects: Project[] = [
     color: "#10b981"
   },
   {
-    id: 5,
+    id: 4,
     title: "Raffle Platform",
     description: "Engaging raffle system with multiple prize types, fair winner selection, and automated distribution.",
     tags: ["Express", "Next.js", "Tailwind CSS", "MongoDB"],
@@ -65,13 +55,23 @@ const projects: Project[] = [
     color: "#10b981"
   },
   {
-    id: 6,
+    id: 5,
     title: "Seicred NFT Marketplace",
     description: "A decentralized NFT marketplace for trading and showcasing digital assets on SEI blockchain.",
     tags: ["NFTs", "MongoDB", "Express", "React.js", "Solidity", "GraphQL"],
     images: ["/project-previews/seicred-marketplace/1.png", "/project-previews/seicred-marketplace/2.png"],
     liveUrl: "https://seicred-marketplace.vercel.app",
     color: "#8b5cf6"
+  },
+  {
+    id: 6,
+    title: "Multi Collection Mints",
+    description: "Highly customizable platform for minting multiple Solana NFT projects.",
+    tags: ["Metaplex", "Express", "Next.js"],
+    images: ["/project-previews/multi-mint/1.png"],
+    liveUrl: "https://multi-mints.vercel.app/",
+    githubUrl: "https://github.com/Utsav1106/multi-candy-machine-mints",
+    color: "#06b6d4"
   },
   {
     id: 7,
