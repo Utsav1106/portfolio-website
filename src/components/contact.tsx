@@ -1,201 +1,161 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { gsap } from 'gsap';
-import { FaEnvelope, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
-import { EMAIL, GITHUB, LINKEDIN, TWITTER } from '@/config';
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { FaTerminal, FaEnvelope, FaGithub, FaLinkedin, FaTwitter, FaCircle } from "react-icons/fa";
 
-
-interface TerminalCommand {
-    command: string;
-    output: string;
-    type: 'info' | 'success' | 'error' | 'warning';
-}
-
-const initialCommands: TerminalCommand[] = [
-    {
-        command: 'whoami',
-        output: 'Utsav Saini - Full Stack Developer & AI Enthusiast',
-        type: 'info'
-    },
-    {
-        command: 'ls skills/',
-        output: 'TypeScript  Node.js  Python  AI/ML  NextJS  GraphQL',
-        type: 'success'
-    },
-    {
-        command: 'cat contact.txt',
-        output: 'Ready to collaborate on your next project!',
-        type: 'info'
-    }
+const EMAIL = "utsavsaini1106@gmail.com";
+const SOCIALS = [
+    { name: "github", url: "https://github.com/Utsav1106" },
+    { name: "linkedin", url: "https://linkedin.com/in/utsav-saini" },
+    { name: "twitter", url: "https://twitter.com/Utsav_256" },
 ];
 
-export const Contact = () => {
-    const sectionRef = useRef<HTMLElement>(null);
-    const terminalRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [commands, setCommands] = useState<TerminalCommand[]>(initialCommands);
-    const [currentInput, setCurrentInput] = useState('');
+const TerminalDisplay = () => {
+    const [lines, setLines] = useState<string[]>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (terminalRef.current) {
-            const terminalBody = terminalRef.current.querySelector('.terminal-body');
-            if (terminalBody) {
-                terminalBody.scrollTop = terminalBody.scrollHeight;
-            }
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
-    }, [commands]);
-
-    const contactCommands: { [key: string]: TerminalCommand } = {
-        'help': { command: 'help', output: 'Available commands: email, linkedin, github, skills, hire, clear', type: 'info' },
-        'email': { command: 'email', output: `Opening mail client... ${EMAIL}`, type: 'success' },
-        'linkedin': { command: 'linkedin', output: `Opening LinkedIn... https://linkedin.com/in/${LINKEDIN}`, type: 'success' },
-        'github': { command: 'github', output: `Opening GitHub... https://github.com/${GITHUB}`, type: 'success' },
-        'skills': { command: 'skills', output: 'Frontend: React, Next.js, TypeScript\nBackend: Node.js, Python, PostgreSQL\nAI/ML: TensorFlow, PyTorch\nWeb3: Solidity, Rust', type: 'success' },
-        'hire': { command: 'hire', output: `Excellent choice! Please send an email to ${EMAIL}.`, type: 'success' },
-        'clear': { command: 'clear', output: '', type: 'info' }
-    };
-
-    const executeCommand = useCallback((input: string) => {
-        const trimmedInput = input.trim().toLowerCase();
-
-        if (trimmedInput === 'clear') {
-            setCommands([]);
-            return;
-        }
-
-        const userCommand: TerminalCommand = { command: `$ ${input}`, output: '', type: 'info' };
-        setCommands(prev => [...prev, userCommand]);
-
-        setTimeout(() => {
-            const response = contactCommands[trimmedInput];
-            if (response) {
-                setCommands(prev => [...prev, response]);
-
-                if (trimmedInput === 'linkedin') setTimeout(() => window.open(`https://linkedin.com/in/${LINKEDIN}`, '_blank'), 500);
-                else if (trimmedInput === 'github') setTimeout(() => window.open(`https://github.com/${GITHUB}`, '_blank'), 500);
-                else if (trimmedInput === 'email') setTimeout(() => window.location.href = `mailto:${EMAIL}`, 500);
-
-            } else {
-                const errorResponse: TerminalCommand = { command: '', output: `Command not found: ${input}. Type 'help' for a list of commands.`, type: 'error' };
-                setCommands(prev => [...prev, errorResponse]);
-            }
-        }, 300);
-    }, [contactCommands, EMAIL, LINKEDIN, GITHUB]);
-
-
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && currentInput.trim()) {
-            executeCommand(currentInput);
-            setCurrentInput('');
-        }
-    };
+    }, [lines]);
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(sectionRef.current,
-                { autoAlpha: 0 },
-                { autoAlpha: 1, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: sectionRef.current, start: 'top 90%' } }
-            );
+        const bootSequence = [
+            "guest@portfolio:~$ initiate_handshake --secure",
+            "> Resolving host: utsav.dev...",
+            "> [SUCCESS] Connection established (24ms)",
+            "> Fetching developer profile...",
+            "> [SUCCESS] Name: Utsav Saini",
+            "> [SUCCESS] Role: Full-Stack Developer",
+            "> [INFO] Status: OPEN_TO_WORK",
+            "----------------------------------------",
+            "> Session ready. Waiting for input..._"
+        ];
 
-            gsap.fromTo('.contact-header',
-                { autoAlpha: 0, y: -50 },
-                { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: '.contact-header', start: 'top 90%' } }
-            );
+        let delay = 0;
+        setLines([]);
 
-            gsap.fromTo('.interactive-column',
-                { autoAlpha: 0, x: -50 },
-                { autoAlpha: 1, x: 0, duration: 1.2, ease: 'power3.out', scrollTrigger: { trigger: '.interactive-column', start: 'top 85%' } }
-            );
+        bootSequence.forEach((line, index) => {
 
-            gsap.fromTo('.direct-contact-column',
-                { autoAlpha: 0, x: 50 },
-                { autoAlpha: 1, x: 0, duration: 1.2, ease: 'power3.out', scrollTrigger: { trigger: '.direct-contact-column', start: 'top 85%' } }
-            );
+            const typingTime = Math.random() * 400 + 300;
 
-        }, sectionRef);
-        return () => ctx.revert();
+            setTimeout(() => {
+                setLines(prev => [...prev, line]);
+            }, delay);
+
+            delay += typingTime;
+        });
+
     }, []);
 
     return (
-        <section ref={sectionRef} id="contact" className="relative py-24 bg-gray-50 dark:bg-black">
-            <div className="absolute inset-0 z-0 opacity-20 dark:opacity-5" style={{ backgroundImage: `radial-gradient(circle, rgba(0, 128, 255, 0.1) 1px, transparent 1px)`, backgroundSize: '2rem 2rem' }} />
+        <div className="h-full w-full overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0c0c0c] shadow-xl flex flex-col font-mono text-xs sm:text-sm transition-colors duration-300">
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6">
-                <div className="contact-header text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-white dark:to-gray-400">
-                        Let's Connect
-                    </h2>
-                    <p className="text-lg max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
-                        Have a project in mind or just want to say hello? Feel free to reach out.
-                    </p>
-                </div>
-
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    <div className="interactive-column">
-                        <div ref={terminalRef} className="bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800 shadow-lg backdrop-blur-sm">
-                            <div className="bg-gray-100 dark:bg-gray-800/80 px-4 py-2 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700/50">
-                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            </div>
-                            <div className="terminal-body h-80 overflow-y-auto p-4 font-mono text-sm" onClick={() => inputRef.current?.focus()}>
-                                <div className="space-y-2">
-                                    {commands.map((cmd, index) => (
-                                        <div key={index}>
-                                            {cmd.command && <p><span className="text-green-600 dark:text-green-400">$</span> <span className="text-gray-800 dark:text-gray-200">{cmd.command.replace('$ ', '')}</span></p>}
-                                            {cmd.output && <p className={`whitespace-pre-wrap ${cmd.type === 'error' ? 'text-red-500' : cmd.type === 'success' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`}>{cmd.output}</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="flex items-center gap-2 mt-2">
-                                    <span className="text-green-600 dark:text-green-400">$</span>
-                                    <input
-                                        ref={inputRef}
-                                        type="text"
-                                        value={currentInput}
-                                        onChange={(e) => setCurrentInput(e.target.value)}
-                                        onKeyDown={handleKeyPress}
-                                        className="bg-transparent text-gray-800 dark:text-white outline-none w-full"
-                                        placeholder="Type 'help'..."
-                                    />
-                                </div>
-                            </div>
-                        </div>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5">
+                <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                        <div className="h-3 w-3 rounded-full bg-red-400" />
+                        <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                        <div className="h-3 w-3 rounded-full bg-green-400" />
                     </div>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 dark:text-neutral-500 text-xs select-none">
+                    <FaTerminal />
+                    <span>bash — 80x24</span>
+                </div>
+                <div className="w-10" />
+            </div>
 
-                    <div>
-                        <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Get in Touch</h3>
-                        <div className="space-y-4">
-                            {[
-                                { title: 'Email', value: EMAIL, href: `mailto:${EMAIL}`, icon: FaEnvelope },
-                                { title: 'LinkedIn', value: LINKEDIN, href: `https://linkedin.com/in/${LINKEDIN}`, icon: FaLinkedin },
-                                { title: 'GitHub', value: GITHUB, href: `https://github.com/${GITHUB}`, icon: FaGithub },
-                                { title: 'Twitter', value: TWITTER, href: `https://twitter.com/${TWITTER}`, icon: FaTwitter },
-                            ].map((contact, index) => {
-                                const Icon = contact.icon;
-                                return (
-                                    <a key={index} href={contact.href} target="_blank" rel="noopener noreferrer" className="group block">
-                                        <div className="p-4 flex items-center gap-4 rounded-lg border border-gray-200 bg-white/80 dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg">
-                                            <div className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 group-hover:text-blue-500">
-                                                <Icon size={20} />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-900 dark:text-white"> {contact.title}</h4>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">{contact.value}</p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                );
-                            })}
+            <div
+                ref={containerRef}
+                className="flex-1 p-4 md:p-6 overflow-y-auto bg-white dark:bg-black/50 font-mono"
+            >
+                <div className="flex flex-col gap-1.5">
+                    {lines.map((line, i) => (
+                        <div key={i} className="break-words leading-relaxed">
+                            <span className={`${line.startsWith("guest") ? "text-purple-600 dark:text-purple-400 font-bold" :
+                                    line.includes("[SUCCESS]") ? "text-green-600 dark:text-green-400" :
+                                        line.includes("[INFO]") ? "text-blue-600 dark:text-blue-400" :
+                                            line.startsWith(">") ? "text-gray-500 dark:text-gray-400" :
+                                                "text-gray-800 dark:text-gray-300"
+                                }`}>
+                                {line}
+                            </span>
+
+                            {i === lines.length - 1 && line.endsWith("_") && (
+                                <motion.span
+                                    animate={{ opacity: [1, 0] }}
+                                    transition={{ duration: 0.8, repeat: Infinity }}
+                                    className="inline-block w-2 h-4 bg-gray-800 dark:bg-gray-200 ml-1 align-middle"
+                                />
+                            )}
                         </div>
-                        <div className="mt-6 p-4 rounded-lg border border-green-500/30 bg-green-500/10 text-sm">
-                            <p className="flex items-center gap-2 font-medium text-green-800 dark:text-green-300">
-                                <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-                                Status: Available for new opportunities
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const Contact = () => {
+    return (
+        <section id="contact" className="relative min-h-screen lg:min-h-[650px] w-full flex items-center justify-center bg-gray-50 dark:bg-black overflow-hidden py-16 lg:py-20 transition-colors duration-300">
+
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-7xl px-6">
+                <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 items-center">
+
+                    <div className="flex flex-col justify-center space-y-8">
+                        <div>
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tight text-gray-900 dark:text-white mb-6">
+                                Let's <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 animate-gradient">
+                                    connect.
+                                </span>
+                            </h2>
+                            <p className="text-lg text-gray-600 dark:text-neutral-400 leading-relaxed max-w-md">
+                                Ready to build something extraordinary? Whether it's a Web3 protocol or a high-performance platform, let's turn your vision into reality.
                             </p>
                         </div>
+
+                        <div className="flex flex-col gap-4">
+                            <a href={`mailto:${EMAIL}`} className="group flex items-center gap-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 transition-all hover:border-gray-300 dark:hover:border-white/20 hover:shadow-lg dark:hover:bg-white/10">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-white text-gray-900 dark:text-black transition-transform group-hover:scale-110">
+                                    <FaEnvelope size={20} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 dark:text-neutral-400 font-bold uppercase tracking-wider">Email Me</p>
+                                    <p className="text-base font-semibold text-gray-900 dark:text-white">{EMAIL}</p>
+                                </div>
+                            </a>
+
+                            <div className="flex gap-4 pt-2">
+                                {SOCIALS.map((social, idx) => (
+                                    <a
+                                        key={idx}
+                                        href={social.url}
+                                        target="_blank"
+                                        className="h-12 w-12 flex items-center justify-center rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-white hover:text-black dark:hover:text-black hover:scale-110 transition-all duration-300"
+                                        aria-label={`Visit my ${social.name} profile`}
+                                    >
+                                        {social.name === 'github' && <FaGithub size={22} />}
+                                        {social.name === 'linkedin' && <FaLinkedin size={22} />}
+                                        {social.name === 'twitter' && <FaTwitter size={22} />}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+
+                    <div className="h-[300px] md:h-[400px] w-full relative">
+                        <TerminalDisplay />
+                    </div>
+
                 </div>
             </div>
         </section>

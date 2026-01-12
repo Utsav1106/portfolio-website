@@ -1,158 +1,232 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, ComponentType } from "react";
-import { motion } from "framer-motion";
+import { useRef, useCallback, ComponentType } from "react";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import gsap from "gsap";
-import { 
-  ReactOriginal, NextjsOriginal, TypescriptOriginal, 
-  NodejsPlain, ExpressOriginal, PythonOriginal, PostgresqlOriginal, 
-  MongodbOriginal, GraphqlPlain, TensorflowOriginal, PytorchOriginal, 
-  SolidityOriginal, 
-  GitOriginal, 
-  TailwindcssOriginal,
-  RustOriginal,
-  NginxOriginal
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  ReactOriginal, NextjsOriginal, TypescriptOriginal, TailwindcssOriginal,
+  ReduxOriginal, FigmaOriginal,
+  NodejsPlain, ExpressOriginal, PostgresqlOriginal, MongodbOriginal,
+  PrismaOriginal, RedisOriginal, GraphqlPlain,
+  PythonOriginal, TensorflowOriginal, PytorchOriginal, RustOriginal, SolidityOriginal,
+  GitOriginal, DockerOriginal, AmazonwebservicesOriginalWordmark, NginxOriginal,
+  LinuxOriginal, PostmanOriginal
 } from 'devicons-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Skill {
   name: string;
-  color: string;
+  desc: string;
+
   icon: ComponentType<{ className?: string, size?: string | number }>;
 }
 
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+  skills: Skill[];
+  color: string;
+}
 
-const skills: Skill[] = [
-  { name: 'React', color: '#61DAFB', icon: ReactOriginal },
-  { name: 'Next.js', color: '#000000', icon: NextjsOriginal },
-  { name: 'TypeScript', color: '#3178C6', icon: TypescriptOriginal },
-  { name: 'Tailwind CSS', color: '#06B6D4', icon: TailwindcssOriginal },
-  { name: 'Node.js', color: '#5FA04E', icon: NodejsPlain },
-  { name: 'Express.js', color: '#404d59', icon: ExpressOriginal },
-  { name: 'Python', color: '#3776AB', icon: PythonOriginal },
-  { name: 'PostgreSQL', color: '#336791', icon: PostgresqlOriginal },
-  { name: 'MongoDB', color: '#47A248', icon: MongodbOriginal },
-  { name: 'GraphQL', color: '#E10098', icon: GraphqlPlain },
-  { name: 'TensorFlow', color: '#FF6F00', icon: TensorflowOriginal },
-  { name: 'PyTorch', color: '#EE4C2C', icon: PytorchOriginal },
-  { name: 'Solidity', color: '#363636', icon: SolidityOriginal },
-  { name: 'Rust', color: '#DE5233', icon: RustOriginal },
-  { name: 'Nginx', color: '#009639', icon: NginxOriginal },
-  { name: 'Git', color: '#F05032', icon: GitOriginal },
+const SKILL_CATEGORIES: Category[] = [
+  {
+    id: "frontend",
+    title: "Frontend & Design",
+    description: "Creating responsive, interactive UIs with modern state management.",
+    color: "from-cyan-400 to-blue-500",
+    skills: [
+      { name: 'React', desc: 'UI Library', icon: ReactOriginal },
+      { name: 'Next.js', desc: 'React Framework', icon: NextjsOriginal },
+      { name: 'TypeScript', desc: 'Static Typing', icon: TypescriptOriginal },
+      { name: 'Tailwind', desc: 'CSS Framework', icon: TailwindcssOriginal },
+      { name: 'Redux', desc: 'State Management', icon: ReduxOriginal },
+      { name: 'Figma', desc: 'UI/UX Design', icon: FigmaOriginal },
+    ]
+  },
+  {
+    id: "backend",
+    title: "Backend & Database",
+    description: "Robust server-side logic, API architecture, and data modeling.",
+    color: "from-emerald-400 to-green-600",
+    skills: [
+      { name: 'Node.js', desc: 'JS Runtime', icon: NodejsPlain },
+      { name: 'Express', desc: 'Web Framework', icon: ExpressOriginal },
+      { name: 'PostgreSQL', desc: 'Relational DB', icon: PostgresqlOriginal },
+      { name: 'MongoDB', desc: 'NoSQL DB', icon: MongodbOriginal },
+      { name: 'Redis', desc: 'Caching Store', icon: RedisOriginal },
+      { name: 'Prisma', desc: 'Modern ORM', icon: PrismaOriginal },
+      { name: 'GraphQL', desc: 'Query Language', icon: GraphqlPlain },
+    ]
+  },
+  {
+    id: "intelligence",
+    title: "AI & Core Tech",
+    description: "Machine learning integration, low-level logic, and Web3 protocols.",
+    color: "from-orange-400 to-red-500",
+    skills: [
+      { name: 'Python', desc: 'AI & Scripting', icon: PythonOriginal },
+      { name: 'TensorFlow', desc: 'ML Library', icon: TensorflowOriginal },
+      { name: 'PyTorch', desc: 'Deep Learning', icon: PytorchOriginal },
+      { name: 'Rust', desc: 'Systems Prog', icon: RustOriginal },
+      { name: 'Solidity', desc: 'Smart Contracts', icon: SolidityOriginal },
+    ]
+  },
+  {
+    id: "devops",
+    title: "DevOps & Tools",
+    description: "Deployment pipelines, containerization, and system management.",
+    color: "from-purple-400 to-indigo-500",
+    skills: [
+      { name: 'Git', desc: 'Version Control', icon: GitOriginal },
+      { name: 'Docker', desc: 'Containerization', icon: DockerOriginal },
+      { name: 'AWS', desc: 'Cloud Services', icon: AmazonwebservicesOriginalWordmark },
+      { name: 'Nginx', desc: 'Web Server', icon: NginxOriginal },
+      { name: 'Linux', desc: 'OS Architecture', icon: LinuxOriginal },
+      { name: 'Postman', desc: 'API Testing', icon: PostmanOriginal },
+    ]
+  }
 ];
 
-export const Skills = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+const SkillItem = ({ skill }: { skill: Skill }) => {
+  return (
+    <motion.div
+      className="relative flex items-center gap-4 p-3 rounded-xl bg-gray-50/50 dark:bg-white/2 transition-all duration-300 group/item cursor-default"
+      whileHover={{ scale: 1.02 }}
+    >
+      <div className="flex-shrink-0 p-2 rounded-lg bg-white dark:bg-black/20 shadow-sm group-hover/item:shadow-md transition-all duration-300">
+        <skill.icon size={24} className="filter opacity-70 transition-all duration-300 group-hover/item:opacity-100" />
+      </div>
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (rect) {
-      setMousePos({
-        x: ((e.clientX - rect.left) / rect.width) * 100,
-        y: ((e.clientY - rect.top) / rect.height) * 100,
-      });
-    }
-  }, []);
+      <div className="flex flex-col">
+        <span className="text-sm font-bold text-gray-800 dark:text-gray-200 tracking-tight leading-none mb-1">
+          {skill.name}
+        </span>
+        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+          {skill.desc}
+        </span>
+      </div>
 
-  useEffect(() => {
-    let throttleTimer: number | null = null;
-    const throttledMouseMove = (e: MouseEvent) => {
-      if (throttleTimer === null) {
-        throttleTimer = window.requestAnimationFrame(() => {
-          handleMouseMove(e);
-          throttleTimer = null;
-        });
-      }
-    };
-    const section = sectionRef.current;
-    if (section) {
-      section.addEventListener('mousemove', throttledMouseMove, { passive: true });
-    }
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(titleRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: "power3.out", scrollTrigger: { trigger: headerRef.current, start: "top 85%" } }
-      );
-      gsap.fromTo('.skill-card',
-        { y: 50, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: { amount: 0.8, from: "random" }, ease: "power2.out", scrollTrigger: { trigger: '.skills-grid', start: "top 80%" } }
-      );
-    }, sectionRef);
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover/item:from-blue-500/5 group-hover/item:to-purple-500/5 opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    </motion.div>
+  );
+};
 
-    return () => {
-      if (section) {
-        section.removeEventListener('mousemove', throttledMouseMove);
-      }
-      ctx.revert();
-    };
-  }, [handleMouseMove]);
+const BentoCard = ({ category, index }: { category: Category, index: number }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const handleMouseMove = useCallback(({ currentTarget, clientX, clientY }: React.MouseEvent) => {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }, [mouseX, mouseY]);
 
   return (
-    <section ref={sectionRef} id="skills" className="relative overflow-hidden py-20 bg-gray-50 dark:bg-black">
-      <div className="absolute inset-0 z-0">
-        <div
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl transition-all duration-1000"
-          style={{ left: `${mousePos.x}%`, top: `${mousePos.y}%` }}
-        />
-      </div>
-      <div className="relative z-10 max-w-5xl mx-auto px-6">
-        <div ref={headerRef} className="text-center mb-12">
-          <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent dark:from-white dark:to-gray-400">
-            My Tech Stack
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto text-gray-600 dark:text-gray-400">
-            The primary languages, frameworks, and tools I use to build modern, high-performance applications.
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      onMouseMove={handleMouseMove}
+      className="group relative overflow-hidden rounded-3xl bg-white dark:bg-gray-900 border border-gray-200/5 dark:border-none p-6 sm:p-8 hover:shadow-xl dark:hover:shadow-blue-900/10 transition-shadow duration-500 h-full flex flex-col"
+    >
+
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              600px circle at ${mouseX}px ${mouseY}px,
+              rgba(14, 165, 233, 0.10),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+
+
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="mb-6">
+          <div className={`w-10 h-1 rounded-full bg-gradient-to-r ${category.color} mb-4 opacity-80`} />
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">{category.title}</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+            {category.description}
           </p>
         </div>
-        <div className="skills-grid grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-9 gap-4">
-          {skills.map((skill) => {
-            const Icon = skill.icon;
-            return (
-              <motion.div
-                key={skill.name}
-                className="skill-card group relative flex flex-col items-center justify-center p-3 aspect-square rounded-xl border transition-all duration-300 cursor-pointer bg-white/60 border-gray-200 hover:border-gray-300 dark:bg-gray-900/50 dark:border-gray-800 dark:hover:border-gray-600 backdrop-blur-sm hover:scale-105 hover:!bg-white dark:hover:!bg-gray-800"
-                onMouseEnter={() => setHoveredSkill(skill.name)}
-                onMouseLeave={() => setHoveredSkill(null)}
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setTooltipPosition({
-                    x: e.clientX,
-                    y: rect.top,
-                  });
-                }}
-                whileHover={{ y: -4 }}
-                style={{ background: hoveredSkill === skill.name ? skill.color + '15' : '' }}
-              >
-                <Icon size="56" className="transition-transform duration-300 group-hover:scale-110" />
-                                
-                <div
-                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ boxShadow: `0 0 25px -5px ${skill.color}` }}
-                />
-              </motion.div>
-            );
-          })}
+
+
+        <div className="mt-auto grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
+          {category.skills.map((skill) => (
+            <SkillItem key={skill.name} skill={skill} />
+          ))}
         </div>
-        {hoveredSkill && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.9 }}
-            className="fixed px-3 py-1.5 rounded-md shadow-lg z-50 pointer-events-none bg-white/80 text-gray-900 border border-gray-200 dark:bg-gray-800/80 dark:text-white dark:border-gray-700 backdrop-blur-md"
-            style={{
-              left: `${tooltipPosition.x}px`,
-              top: `${tooltipPosition.y}px`,
-              transform: 'translate(-50%, -120%)'
-            }}
-          >
-            <span className="text-sm font-medium">{hoveredSkill}</span>
-          </motion.div>
-        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export const Skills = () => {
+  const containerRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.fromTo(headingRef.current,
+      { y: 30, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headingRef.current,
+          start: "top 85%",
+        }
+      }
+    );
+  }, { scope: containerRef });
+
+  return (
+    <section
+      ref={containerRef}
+      id="skills"
+      className="relative py-16 md:py-32 overflow-hidden bg-gray-50 dark:bg-black"
+    >
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
+
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[100px] mix-blend-multiply dark:bg-blue-900/10" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] bg-cyan-400/10 rounded-full blur-[100px] mix-blend-multiply dark:bg-cyan-900/10" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+        <div ref={headingRef} className="max-w-3xl mx-auto text-center mb-16 sm:mb-20">
+          <h2 className="text-sm sm:text-base font-semibold tracking-wide text-blue-600 dark:text-blue-400 uppercase mb-3">
+            Technical Proficiency
+          </h2>
+          <p className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+            A digital toolkit for <br className="hidden md:block" />
+            <span className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-gray-200 dark:to-gray-400 bg-clip-text text-transparent">
+              intelligent solutions.
+            </span>
+          </p>
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+            I architect ecosystems using a modern, scalable stack.
+          </p>
+        </div>
+
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {SKILL_CATEGORIES.map((category, index) => (
+            <BentoCard key={category.id} category={category} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Utsav Saini - Portfolio",
     description: "Building the next generation of web applications. I architect full-stack solutions with a passion for integrating cutting-edge AI and Web3 technologies to solve complex challenges.",
-    url: "https://utsavsaini.netlify.app",
+    url: "https://utsavsaini.vercel.app",
     images: "/logo.png",
   }
 };
