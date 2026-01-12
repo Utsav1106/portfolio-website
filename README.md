@@ -63,8 +63,6 @@ I'm always open to new opportunities, collaborations, or just a chat about tech!
 - 🐦 **Twitter**: [@Utsav_256](https://twitter.com/Utsav_256)
 - 💻 **GitHub**: [Utsav1106](https://github.com/Utsav1106)
 
-Or, try my interactive terminal on [my portfolio](https://utsavsaini.vercel.app/#contact) to run commands like `help`, `email`, or `hire`!
-
 <div align="center">
   <img src="https://komarev.com/ghpvc/?username=Utsav1106&style=flat-square&color=blue" alt="Profile Views" />
 </div>
